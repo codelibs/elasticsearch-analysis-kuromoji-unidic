@@ -27,7 +27,7 @@
 	</parent>
 	<properties>
 		<elasticsearch.version>6.4.1</elasticsearch.version>
-		<elasticsearch.plugin.classname>org.codelibs.elasticsearch.kuromoji.unidic.KuromojiNeologdPlugin</elasticsearch.plugin.classname>
+		<elasticsearch.plugin.classname>org.codelibs.elasticsearch.kuromoji.unidic.KuromojiUnidicPlugin</elasticsearch.plugin.classname>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<lucene.version>7.4.0</lucene.version>
