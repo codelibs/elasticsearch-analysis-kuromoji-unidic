@@ -16,13 +16,7 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-analysis-kuromo
 
 ## Installation
 
-### For 5.x - 6.x
-
-    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-analysis-kuromoji-unidic:5.6.1
-
-### For 2.x
-
-    $ $ES_HOME/bin/plugin install org.codelibs/elasticsearch-analysis-kuromoji-unidic/2.4.1
+    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-analysis-kuromoji-unidic:6.4.0
 
 ## References
 
