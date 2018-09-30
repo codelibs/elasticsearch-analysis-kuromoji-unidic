@@ -149,6 +149,77 @@ public class KuromojiUnidicPluginTest {
 
     }
 
+    @Test
+    public void test_kuromoji_unidic_synonym() throws Exception {
+        userDictFiles = new File[numOfNode*2];
+        for (int i = 0; i < numOfNode; i++) {
+            String homePath = runner.getNode(i).settings().get("path.home");
+            File confPath = new File(homePath, "config");
+            userDictFiles[2 * i] = new File(confPath, "userdict_ja.txt");
+            updateDictionary(userDictFiles[2 * i], "モンスターバッシュ,モンスターバッシュ,モンスターバッシュ,カスタム名詞"//
+                    + "\nモンバス,モンバス,モンバス,カスタム名詞");
+            userDictFiles[2 * i + 1] = new File(confPath, "synonyms.txt");
+            updateDictionary(userDictFiles[2 * i + 1], "モンバス,モンスターバッシュ");
+        }
+
+        runner.ensureYellow();
+        Node node = runner.node();
+
+        final String index = "dataset";
+        final String type = "item";
+
+        final String indexSettings = "{\"index\":{\"analysis\":{" + "\"tokenizer\":{"//
+//                + "\"kuromoji_user_dict\":{\"type\":\"kuromoji_unidic_tokenizer\"}" // ignore synonyms
+                + "\"kuromoji_user_dict\":{\"type\":\"kuromoji_unidic_tokenizer\",\"user_dictionary\":\"userdict_ja.txt\"}"
+                + "},"//
+                + "\"filter\":{"
+                + "\"ja_synonym\":{\"type\":\"synonym_graph\",\"synonyms_path\":\"synonyms.txt\",\"lenient\":true}"
+                + "},"//
+                + "\"analyzer\":{"
+                + "\"ja_analyzer\":{\"type\":\"custom\",\"tokenizer\":\"kuromoji_user_dict\",\"filter\":[\"ja_synonym\",\"kuromoji_unidic_stemmer\"]}"
+                + "}"//
+                + "}}}";
+        runner.createIndex(index, Settings.builder().loadFromSource(indexSettings, XContentType.JSON).build());
+
+        // create a mapping
+        final XContentBuilder mappingBuilder = XContentFactory.jsonBuilder()//
+                .startObject()//
+                .startObject(type)//
+                .startObject("properties")//
+
+                // id
+                .startObject("id")//
+                .field("type", "keyword")//
+                .endObject()//
+
+                // msg1
+                .startObject("msg")//
+                .field("type", "text")//
+                .field("analyzer", "ja_analyzer")//
+                .endObject()//
+
+                .endObject()//
+                .endObject()//
+                .endObject();
+        runner.createMapping(index, type, mappingBuilder);
+
+        final IndexResponse indexResponse1 = runner.insert(index, type, "1", "{\"msg\":\"モンバス\", \"id\":\"1\"}");
+        assertEquals(RestStatus.CREATED, indexResponse1.status());
+        runner.refresh();
+
+        assertDocCount(1, index, type, "msg", "モンバス");
+
+        String text = "モンスターバッシュ";
+        try (CurlResponse response = EcrCurl.post(node, "/" + index + "/_analyze").header("Content-Type", "application/json")
+                .body("{\"analyzer\":\"ja_analyzer\",\"text\":\"" + text + "\"}").execute()) {
+            System.out.println(response.getContentAsString());
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> tokens = (List<Map<String, Object>>) response.getContent(EcrCurl.jsonParser).get("tokens");
+            assertEquals("モンバス", tokens.get(0).get("token").toString());
+            assertEquals("モンスターバッシュ", tokens.get(1).get("token").toString());
+        }
+    }
+
     private void assertDocCount(int expected, final String index, final String type, final String field, final String value) {
         final SearchResponse searchResponse =
                 runner.search(index, type, QueryBuilders.matchPhraseQuery(field, value), null, 0, numOfDocs);
