@@ -40,7 +40,7 @@ See [Elasticsearch Kuromoji](https://github.com/elastic/elasticsearch-analysis-k
 
 ### Update Kuromoji Jar File
 
-If you want to replace with the latest Lucene Unidic jar file, download it from http://maven.codelibs.org/org/codelibs/lucene-analyzers-kuromoji-unidic/ and then replace old file in $ES_HOME/plugins/analysis-kuromoji-unidic.
+If you want to replace with the latest Lucene Unidic jar file, download it from https://maven.codelibs.org/org/codelibs/lucene-analyzers-kuromoji-unidic/ and then replace old file in $ES_HOME/plugins/analysis-kuromoji-unidic.
 
 ### What is UniDic
 
@@ -56,7 +56,7 @@ To use the jar file, put the following settings into your pom.xml.
         <repository>
             <id>codelibs.org</id>
             <name>CodeLibs Repository</name>
-            <url>http://maven.codelibs.org/</url>
+            <url>https://maven.codelibs.org/</url>
         </repository>
     </repositories>
     ...
@@ -68,5 +68,5 @@ To use the jar file, put the following settings into your pom.xml.
         </dependency>
     ...
 
-See [CodeLibs Maven Repository](http://maven.codelibs.org/org/codelibs/lucene-analyzers-kuromoji-unidic/).
+See [CodeLibs Maven Repository](https://maven.codelibs.org/org/codelibs/lucene-analyzers-kuromoji-unidic/).
 
